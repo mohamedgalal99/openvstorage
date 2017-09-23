@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+ps aux | grep cacheBackend01-nsm_7
+#ovs       8663  0.3  0.2 1492888 689768 ?      Ssl  Aug24  94:51 /usr/bin/arakoon --node G69dW9l5JYvA1e6h -config arakoon://config/ovs/arakoon/cacheBackend01-nsm_7/config?ini=%2Fopt%2FOpenvStorage%2Fconfig%2Farakoon_cacc.ini -autofix -start
+
+cat /etc/openvstorage_id	#get storage id to know if it's master or secondry
+
+arakoon -config arakoon://config/ovs/arakoon/cacheBackend01-nsm_7/config?ini=%2Fopt%2FOpenvStorage%2Fconfig%2Farakoon_cacc.ini  --statistics | grep node_is
+arakoon -config arakoon://config/ovs/arakoon/cacheBackend01-nsm_7/config?ini=%2Fopt%2FOpenvStorage%2Fconfig%2Farakoon_cacc.ini --who-master
+netstat -atnp | grep 8663 | grep LISTEN
+#tcp        0      0 10.200.3.61:26446       0.0.0.0:*               LISTEN      8663/arakoon    
+#tcp        0      0 10.200.3.61:26447       0.0.0.0:*               LISTEN      8663/arakoon    
+
+=> arakoon --drop-master cacheBackend01-nsm_10  10.200.3.61 26460 ## if node is master
+arakoon --optimize-db cacheBackend01-nsm_7 10.200.3.61 26446
+
